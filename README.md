@@ -20,19 +20,21 @@
 - 
 - 
 
-## users テーブル
+## game テーブル
 
-| Column             | Type   | Options                   |
-| ------------------ | ------ | ------------------------- |
-| username           | string | null: false               |
-| email              | string | null: false, unique: true |
-| encrypted_password | string | null: false               |
-| family_name        | string | null: false               |
-| first_name         | string | null: false               |
-| family_name_kana   | string | null: false               |
-| first_name_kana    | string | null: false               |
-| birth_day          | date   | null: false               |
+| Column                      | Type   | Options                   |
+| --------------------------  | ------ | ------------------------- |
+| game_user_character_id      | string | null: false               |
+| game_description            | string | null: false, unique: true |
+| game_ability_id             | string | null: false               |
+| game_matching_character_id  | string | null: false               |
+| game_matching_ability_id    | string | null: false               |
 
+
+### Association
+
+- 
+- 
 
 This README would normally document whatever steps are necessary to get the
 application up and running.
