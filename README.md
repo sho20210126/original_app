@@ -31,10 +31,17 @@
 | game_matching_ability_id    | string | null: false               |
 
 
+
 ### Association
 
 - 
 - 
+## game テーブル
+
+
+
+
+
 
 This README would normally document whatever steps are necessary to get the
 application up and running.
