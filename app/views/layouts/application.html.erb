@@ -1,15 +1,42 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>OriginalApp</title>
+    <title>EmoSha</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
   <body>
+    <header>
+      <div class="header">
+        <div class="header-left">
+          <h1 class="title"><a href="/">エモ写</a></h1>
+          <p class="sub-title">懐かしくてエモい写真館</p>
+        </div>
+        <div class="header-right">
+          <% if user_signed_in? %>
+            <div class="login">
+              <div class="login-low">
+                <div class="label"><%= "#{current_user.age}歳用" %></div>
+                <%= link_to "変更", destroy_user_session_path, method: :delete, class: "btn" %>
+            </div>
+          </div>
+          <% else %>
+            <%= render "devise/sessions/new" %>
+          <% end %>
+        </div>
+      </div>
+      <ul class="header-lower">
+        <a class="list" href="/"><li>メイン</li></a>
+        <a class="list" href="/items"><li>ランキング</li></a>
+        <a class="list" href="/items/new"><li>写真投稿</li></a>
+      </ul>
+    </header>
     <%= yield %>
+    <footer>
+      <p>Copyright EmoSha 2020.</p>
+    </footer>
   </body>
 </html>

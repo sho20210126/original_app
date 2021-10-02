@@ -1,0 +1,197 @@
+<%# ①ログインしている場合 %>
+<% if user_signed_in? %>
+  <%# ②ホームボタン押した場合 %>
+  <% if params[:id] == nil %>
+    <%# ③次の評価アイテムが決まってない場合 %>
+    <% if $item_choice == nil %>
+      <% @items = Item.all %>
+      <% $item_menu = [] %>
+      <% @items.each do |item| %>
+        <% $item_menu << item.id %>
+      <% end %>
+      <% random = rand($item_menu.length) %>
+      <% $item_choice = $item_menu[random] %>
+      <% $item_menu.delete_at(random) %>
+
+      <table>
+        <tr><td><a href="/items/start"><%= image_tag "start.png", class: "choice" %></a></td></tr>
+        <tr><td><button><a class="show" href="/items/<%= $item_choice%>">スタート</a></button></td></tr>
+      </table>
+    <%# ③次の評価アイテムが決まっている場合 %>
+    <% else %>
+      <%# ④未評価アイテムidの配列が空になった場合 %>
+      <% if $item_menu == [] %>
+        <table>
+          <tr><td><a href="/items/start"><%= image_tag "reset.png", class: "choice" %></a></td></tr>
+          <tr><td><button><a class="show" href="/items/start">最初から</a></button></td></tr>
+        </table>
+      <%# ④未評価アイテムidの配列が未だある場合 %>
+      <% else %>
+        <table>
+          <tr>
+            <td><a href="/items/start"><%= image_tag "reset.png", class: "choice" %></a></td>
+            <td><a href="javascript:history.back()"><%= image_tag "more.png", class: "choice" %></a></td>
+          </tr>
+          <tr>
+            <td><button><a class="show" href="/items/start">最初から</a></button></td>
+            <td><button><a class="show" href="javascript:history.back()">続きに戻る</a></button></td>
+          </tr>
+        </table>
+      <% end %>
+    <% end %>
+  <%# ②評価再スタートページ %>
+  <% elsif params[:id] == "start" %>
+    <% @items = Item.all %>
+    <% $item_menu = [] %>
+    <% @items.each do |item| %>
+      <% $item_menu << item.id %>
+    <% end %>
+    <% random = rand($item_menu.length) %>
+    <% $item_choice = $item_menu[random] %>
+    <% $item_menu.delete_at(random) %>
+    <table>
+      <tr>
+        <td><a href="/items/<%= $item_choice%>"><%= image_tag "restart.png", class: "choice" %></a></td>
+      </tr>
+      <tr>
+        <td><button><a class="show" href="/items/<%= $item_choice%>">再スタート</a></button></td>
+      </tr>
+    </table>
+  <%# ②評価完了ページ %>
+  <% elsif params[:id] == "finish" %>
+    <table>
+      <tr>
+        <td><a href="/items/"><%= image_tag "summary.png", class: "choice" %></a></td>
+      </tr>
+      <tr>
+        <td><button><a href="/items/">一覧へ移動</a></button></td>
+      </tr>
+    </table>
+  <% else %>
+  <%# ②各アイテムの詳細ページ %>
+  <h2><%= @item.name %></h2>
+  <% if @item.url != "" %>
+    <a href="<%= @item.url %>"target="_blank" rel="noopener noreferrer">
+      <p class="frame"><%= image_tag @item.image.variant(resize: '300x300'), class: 'item-image' if @item.image.attached? %></p>
+    </a>
+    <p class="url-title"><%= "写真引用元 (写真をクリックすると新規タブで開きます)" %></p>
+    <p class="url"><%= "#{@item.url}" %></p>
+  <% else %>
+    <p class="frame"><%= image_tag @item.image.variant(resize: '300x300'), class: 'item-image' if @item.image.attached? %></p>
+    <p class="url-title"><%= "写真引用元" %></p>
+    <p class="url" style="text-align:center"><%= "＜この写真にはリンク先がありません＞" %></p>
+  <% end %>
+<%# ↓↓↓ 事前計算 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ %>
+  <%# 各評価の票数とパーセントとコメントの初期化 %>
+  <% total = 0 %>
+  <% point1 = 0 %>
+  <% point2 = 0 %>
+  <% point3 = 0 %>
+  <% ratio1 = 0 %>
+  <% ratio2 = 0 %>
+  <% ratio3 = 0 %>
+  <% comments = [] %>
+  <%# 年齢の範囲（上下限設定） %>
+  <% lowerage = (current_user.id-5) %>
+  <% lowerage = 20 if lowerage < 20 %>
+  <% upperage = (current_user.id+5) %>
+  <% upperage = 60 if upperage > 60 %>
+  <% if @evaluations %>
+    <% @evaluations.each do |evaluation| %>
+      <%# 各評価の票数とパーセントの計算 %>
+      <% if evaluation.user_id >= lowerage && evaluation.user_id <= upperage %>
+        <% total += 1 %>
+        <% if evaluation.rate == 1 %>
+          <% point1 += 1 %>
+        <% elsif evaluation.rate == 2 %>
+          <% point2 += 1 %>
+        <% elsif evaluation.rate == 3 %>
+          <% point3 += 1 %>
+        <% end %>
+      <% end %>
+      <% if total != 0 %>
+        <% ratio1 = point1 * 100 / total %>
+        <% ratio2 = point2 * 100 / total %>
+        <% ratio3 = point3 * 100 / total %>
+      <% end %>
+      <%# 評価のコメントを配列に入れておく（後で使う） %>
+      <% if evaluation.comment %>
+        <% comments << "#{evaluation.comment} (#{evaluation.user.age}歳)" %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <p>コメントはありません</p>
+  <% end %>
+<%# ↑↑↑ 事前計算 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ %>
+  <%# 評価ボタン %>
+  <table>
+    <tr>
+      <td>
+        <%= form_with(model: [@item, @evaluation], local: true) do |f| %>
+          <%= f.hidden_field :rate, value: 1 %>
+          <%= f.submit "知らない", class: 'rate' %>
+        <% end %>
+      </td>
+      <td>
+        <%= form_with(model: [@item, @evaluation], local: true) do |f| %>
+          <%= f.hidden_field :rate, value: 2 %>
+          <%= f.submit "知ってる", class: 'rate' %>
+        <% end %>
+      </td>
+      <td>
+        <%= form_with(model: [@item, @evaluation], local: true) do |f| %>
+          <%= f.hidden_field :rate, value: 3 %>
+          <%= f.submit "エモい！", class: 'rate' %>
+        <% end %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= "#{ratio1}%(#{point1}票)" %></td>
+      <td><%= "#{ratio2}%(#{point2}票)" %></td>
+      <td><%= "#{ratio3}%(#{point3}票)" %></td>
+    </tr>
+  </table>
+  
+  <div class="note"><%= "※ 数値はあなたと同年代(#{lowerage}~#{upperage}歳)のみんなの評価です。" %></div>
+
+  <div class="comment-area">
+    <% if user_signed_in? %>
+      <div class="form-post">
+        <%= form_with(model: [@item, @evaluation], local: true) do |f| %>
+        <%= f.text_field :comment, class: 'form-comment', placeholder: "エモりすぎた人はこちらに一言"%>
+        <%= f.hidden_field :rate, value: 3 %>
+        <%= f.submit "投稿", class: 'btn submit' %>
+        <% end %>
+      </div>
+    <% end %>
+    <div class="comment-list">
+      <h3>＜コメント一覧＞</h3>
+      <ul class="comment">
+        <% comments.each do |comment| %>
+            <li><%= simple_format("#{comment}") %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
+  <% end %>
+<%# ①ログインしてない場合 %>
+<% else %>
+  <% if params[:id] %>
+    <% $item_choice = params[:id] %>
+    <% @items = Item.all %>
+    <% $item_menu = [] %>
+    <% @items.each do |item| %>
+        <% $item_menu << item.id %>
+    <% end %>
+    <% $item_choice = params[:id] %>
+    <% $item_menu.delete($item_choice) %>
+  <% else%>
+    <% $item_choice = nil %>
+  <% end %>
+
+  <h2>まずは年齢を選択</h2>
+  <p class="frame"><%= image_tag "age-select.jpg", class: 'item-image' %></p>
+
+<% end %>
