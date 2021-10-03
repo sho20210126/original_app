@@ -1,54 +1,51 @@
 # README
 
 
-
-
-
-
-
-
 # テーブル設計
 
-## users テーブル
+## Users テーブル
 
-| Column             | Type   | Options                   |
-| ------------------ | ------ | ------------------------- |
-| username           | string | null: false               |
-| email              | string | null: false, unique: true |
-| encrypted_password | string | null: false               |
-| family_name        | string | null: false               |
-| first_name         | string | null: false               |
-| family_name_kana   | string | null: false               |
-| first_name_kana    | string | null: false               |
-| birth_day          | date   | null: false               |
-
-### Association
-
-- 
-- 
-
-## game テーブル
-
-| Column                      | Type   | Options                   |
-| --------------------------  | ------ | ------------------------- |
-| game_user_character_id      | string | null: false               |
-| game_description            | string | null: false, unique: true |
-| game_ability_id             | string | null: false               |
-| game_matching_character_id  | string | null: false               |
-| game_matching_ability_id    | string | null: false               |
-
+| Column             | Type    | Options                   |
+| ------------------ | ------- | ------------------------- |
+| user               | string  | null: false               |
+| email              | string  | null: false, unique: true |
+| picture            | string  | null: false               |
+| introduction       | string  | null: false               |
+| sex                | string  | null: false               |
+| admin              | boolean | null: false               |
+| password_digest    |         | null: false               |
+| remenber_digest    |         | null: false               |
 
 ### Association
 
 - 
 - 
-## chat テーブル
 
-| Column  | Type       | Options                        |
-| ------- | ---------- | ------------------------------ |
-| content | string     |                                |
-| user    | references | null: false, foreign_key: true |
-| room    | references | null: false, foreign_key: true |
+## Relationship テーブル
+
+| Column                      | Type    | Options                   |
+| --------------------------  | ------- | ------------------------- |
+| follower_id                 | integer | null: false               |
+| followered_id               | integer | null: false, unique: true |
+
+### Association
+
+- 
+- 
+## Dish テーブル
+
+| Column         | Type       | Options                        |
+| -------        | ---------- | ------------------------------ |
+| name           | string     |                                |
+| user_id        | references | null: false, foreign_key: true |
+| picture        | string     | null: false, foreign_key: true |
+| description    | string     |                                |
+| portion        | string     |                                |
+| tips           | string     |                                |
+| reference      | text       |                                |
+| required_time  | text       |                                |
+| popularity    | text        |                                |
+| cook_memo     | text        |                                |
 
 ### Association
 
